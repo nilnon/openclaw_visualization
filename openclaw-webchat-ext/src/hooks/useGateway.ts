@@ -199,9 +199,15 @@ export function useGateway(gatewayUrl?: string, token?: string) {
   }, []);
 
   // 发送消息
-  const send = useCallback((type: string, payload: any) => {
+  const send = useCallback((method: string, params: any) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ type, payload }));
+      const request = {
+        type: 'req',
+        id: crypto.randomUUID(),
+        method,
+        params,
+      };
+      wsRef.current.send(JSON.stringify(request));
     } else {
       console.warn('[Gateway] Not connected');
     }
@@ -209,6 +215,16 @@ export function useGateway(gatewayUrl?: string, token?: string) {
 
   // 发送聊天消息
   const sendMessage = useCallback((text: string, sessionId?: string) => {
+    // 添加用户消息到本地状态
+    const userMessage: ChatMessage = {
+      id: crypto.randomUUID(),
+      role: 'user',
+      content: text,
+      timestamp: Date.now(),
+      done: true,
+    };
+    setMessages((prev) => [...prev, userMessage]);
+
     send('chat.send', {
       text,
       sessionId: sessionId || currentSession,
