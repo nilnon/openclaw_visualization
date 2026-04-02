@@ -12,7 +12,7 @@ export async function buildConnectParams(params: {
       mode: 'cli',
     },
     role: 'operator',
-    scopes: ['operator.read', 'operator.write', 'operator.admin'],
+    scopes: ['operator.read', 'operator.write'],
     caps: [],
     commands: [],
     permissions: {},
